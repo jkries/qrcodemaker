@@ -3,12 +3,14 @@
 import qrcode # Import QR Code library with pip install qrcode[pil]
 import sys #To exit the program if QR data is not given
 import os #To create the save folder if not already there
-from PIL import Image #Display the image
+from PIL import Image, ImageDraw, ImageFont #Save and display the image
 import time #For the waiting
 
 # Prompt user for the data that you want to store, the filename, desired size, and format of the QR code image:
 print('===============================================')
 data = input('What do you want in your QR code: ')
+print('===============================================')
+qrLabel = input('Do you want a caption? (Leave blank for no caption) ')
 print('===============================================')
 qrName = input('What do you want to name the QR code file? ')
 print('===============================================')
@@ -20,6 +22,14 @@ print('===============================================')
 if len(str(data)) == 0:
     print('You did not enter anything.  Exiting Program...')
     sys.exit()
+
+doCaption = 1
+if len(str(qrLabel)) == 0:
+    doCaption = 0
+else:
+    if len(str(qrLabel)) > 24:
+        qrLabel = qrLabel[0:24]
+        print('Truncating your caption to make it fit.')
 
 if len(str(qrName)) == 0:
     print('You did not pick a filename.  Using "myQr" as the filename.')
@@ -63,6 +73,13 @@ qr.make(fit=True)
 
 # Create an image from the QR Code instance
 img = qr.make_image()
+
+#Are we adding a caption?
+if doCaption:
+    draw = ImageDraw.Draw(img)
+    # use a truetype font
+    font = ImageFont.truetype("fonts/FreeMono.ttf", 20)
+    draw.text((0, 0), qrLabel, font=font)
 
 # Save it somewhere, change the extension as needed:
 img.save("savefolder/" + str(qrName) + imageExt)
