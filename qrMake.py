@@ -27,9 +27,16 @@ doCaption = 1
 if len(str(qrLabel)) == 0:
     doCaption = 0
 else:
+    if not os.path.exists('fonts/FreeMono.ttf'):
+        doCaption = 0
+        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+        print('I could not find a font file to make your caption!\nPlease download FreeMono.ttf and put it in the fonts folder.')
+        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
     if len(str(qrLabel)) > 24:
-        qrLabel = qrLabel[0:24]
-        print('Truncating your caption to make it fit.')
+        #Removed for now
+        print('We are doing a caption.')
+        #qrLabel = qrLabel[0:24]
+        #print('Truncating your caption to make it fit.')
 
 if len(str(qrName)) == 0:
     print('You did not pick a filename.  Using "myQr" as the filename.')
@@ -77,8 +84,21 @@ img = qr.make_image()
 #Are we adding a caption?
 if doCaption:
     draw = ImageDraw.Draw(img)
-    # use a truetype font
-    font = ImageFont.truetype("fonts/FreeMono.ttf", 20)
+    QRwidth, QRheight = img.size
+    fontSize = 1
+
+    # portion of image width you want text width to be
+    img_fraction = 0.95
+    font = ImageFont.truetype("fonts/FreeMono.ttf", fontSize)
+    while font.getsize(qrLabel)[0] < img_fraction*img.size[0]:
+        fontSize += 1
+        font = ImageFont.truetype("fonts/FreeMono.ttf", fontSize)
+
+    print('Font size:')
+    print(font.getsize(qrLabel)[0])
+
+    print('Image is ' + str(QRwidth) + ' wide and ' + str(QRheight) + ' high.')
+
     draw.text((0, 0), qrLabel, font=font)
 
 # Save it somewhere, change the extension as needed:
