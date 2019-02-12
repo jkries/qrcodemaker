@@ -8,7 +8,10 @@ import time #For the waiting
 
 # Prompt user for the data that you want to store, the filename, desired size, and format of the QR code image:
 print('===============================================')
-data = input('What do you want in your QR code: ')
+data = input('What info do you want in your QR code: ')
+if len(str(data)) == 0:
+    print('You did not enter anything.  Exiting Program...')
+    sys.exit()
 print('===============================================')
 qrLabel = input('Do you want a caption? (Leave blank for no caption) ')
 print('===============================================')
@@ -18,10 +21,6 @@ boxPixels = input('If you want to make the boxes bigger than 10 pixels wide, ent
 print('===============================================')
 imageType = input('Press enter to save as PNG (default), 1 for JPG, 2 for JPEG, 3 for BMP: ')
 print('===============================================')
-
-if len(str(data)) == 0:
-    print('You did not enter anything.  Exiting Program...')
-    sys.exit()
 
 doCaption = 1
 if len(str(qrLabel)) == 0:
@@ -44,7 +43,7 @@ if len(str(qrName)) == 0:
     qrName = 'myQR'
 
 if len(str(boxPixels)) == 0:
-    print('You did not set a pixel size for boxes. I will use 10')
+    print('You did not set a pixel size for boxes. Using 10 pixels per box.')
     print('===============================================')
     boxPixels = 10
 
@@ -85,21 +84,19 @@ img = qr.make_image()
 if doCaption:
     draw = ImageDraw.Draw(img)
     QRwidth, QRheight = img.size
-    fontSize = 1
-
-    # portion of image width you want text width to be
-    img_fraction = 0.95
+    fontSize = 1 #starting font size
+    img_fraction = 0.90 # portion of image width you want text width to be
+    fontHeightMax = qr.border * qr.box_size - 10
+    captionX = 0
+    captionY = 0
+    print('Font height max is set to: ' + str(fontHeightMax))
     font = ImageFont.truetype("fonts/FreeMono.ttf", fontSize)
-    while font.getsize(qrLabel)[0] < img_fraction*img.size[0]:
+    while font.getsize(qrLabel)[0] < img_fraction*img.size[0] and font.getsize(qrLabel)[1] < fontHeightMax:
         fontSize += 1
         font = ImageFont.truetype("fonts/FreeMono.ttf", fontSize)
-
-    print('Font size:')
-    print(font.getsize(qrLabel)[0])
-
-    print('Image is ' + str(QRwidth) + ' wide and ' + str(QRheight) + ' high.')
-
-    draw.text((0, 0), qrLabel, font=font)
+    captionX = int(img.size[0] - font.getsize(qrLabel)[0]) / 2 #Center the label
+    print('Offset: ' + str(captionX))
+    draw.text((captionX, captionY), qrLabel, font=font)
 
 # Save it somewhere, change the extension as needed:
 img.save("savefolder/" + str(qrName) + imageExt)
