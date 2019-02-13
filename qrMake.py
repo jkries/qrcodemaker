@@ -23,13 +23,15 @@ imageType = input('Press enter to save as PNG (default), 1 for JPG, 2 for JPEG, 
 print('===============================================')
 
 doCaption = 1
+fontFile = 'fonts/FreeMono.ttf'
+fontName = 'FreeMono.ttf'
 if len(str(qrLabel)) == 0:
     doCaption = 0
 else:
-    if not os.path.exists('fonts/FreeMono.ttf'):
+    if not os.path.exists(fontFile):
         doCaption = 0
         print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-        print('I could not find a font file to make your caption!\nPlease download FreeMono.ttf and put it in the fonts folder.')
+        print('I could not find a font file to make your caption!\nPlease download ' + fontName + ' and put it in the fonts folder.')
         print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
     if len(str(qrLabel)) > 24:
         #Removed for now
@@ -85,16 +87,16 @@ if doCaption:
     draw = ImageDraw.Draw(img)
     QRwidth, QRheight = img.size
     fontSize = 1 #starting font size
-    img_fraction = 0.90 # portion of image width you want text width to be
+    img_fraction = 0.90 # portion of image width you want text width to be, I've had good luck with .90
     fontHeightMax = qr.border * qr.box_size - 10
     captionX = 0
     captionY = 0
     print('Font height max is set to: ' + str(fontHeightMax))
-    font = ImageFont.truetype("fonts/FreeMono.ttf", fontSize)
-    while font.getsize(qrLabel)[0] < img_fraction*img.size[0] and font.getsize(qrLabel)[1] < fontHeightMax:
+    font = ImageFont.truetype(fontFile, fontSize)
+    while font.getsize(qrLabel)[0] < img_fraction*QRwidth and font.getsize(qrLabel)[1] < fontHeightMax:
         fontSize += 1
-        font = ImageFont.truetype("fonts/FreeMono.ttf", fontSize)
-    captionX = int(img.size[0] - font.getsize(qrLabel)[0]) / 2 #Center the label
+        font = ImageFont.truetype(fontFile, fontSize)
+    captionX = int(QRwidth - font.getsize(qrLabel)[0]) / 2 #Center the label
     print('Offset: ' + str(captionX))
     draw.text((captionX, captionY), qrLabel, font=font)
 
